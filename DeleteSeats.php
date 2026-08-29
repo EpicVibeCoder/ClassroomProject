@@ -5,6 +5,8 @@ require_once __DIR__ . '/config/rate_limit.php';
 
 require_csrf();
 
+global $link;
+
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
   http_response_code(405);
   header('Allow: POST');

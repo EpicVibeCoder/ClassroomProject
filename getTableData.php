@@ -3,6 +3,8 @@ require_once __DIR__ . '/config/bootstrap.php';
 require_once __DIR__ . '/config/csrf.php';
 require_once __DIR__ . '/config/rate_limit.php';
 
+global $link;
+
 // Always return JSON
 header('Content-Type: application/json');
 

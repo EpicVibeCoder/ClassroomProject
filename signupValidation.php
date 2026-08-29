@@ -5,7 +5,7 @@ require_once __DIR__ . '/config/bootstrap.php';
 require_once __DIR__ . '/config/csrf.php';
 require_once __DIR__ . '/config/rate_limit.php';
 header('Content-Type: application/json');
-
+global $link;
 // IP-based throttle (per client IP address, backed by ip_rate_limits table):
 // max 10 signup attempts per hour from the same IP.
 $rl = rate_limit_ip_status('signup_ip', 10, 3600);
@@ -72,7 +72,7 @@ if ($name != "" and $email != "" and $password != "" and $retype_password != "")
         // Hashed the password before storing
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
         // Using prepared statement to prevent SQL injection
-        $stmt = $link->prepare("INSERT INTO user (name, email, password) VALUES (?, ?, ?)");
+        $stmt = $link->prepare("INSERT INTO user (name, email, password, secret_key, `2FA_enabled`) VALUES (?, ?, ?, '', 0)");
         $stmt->bind_param("sss", $name, $email, $hashed_password);
 
         if ($stmt->execute()) {

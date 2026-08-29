@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/config/bootstrap.php';
 require_once __DIR__ . '/config/csrf.php';
-
+global $link;
 
 // If not fully authenticated, go to account
 if (empty($_SESSION['user_id']) || empty($_SESSION['mfa_passed'])) {

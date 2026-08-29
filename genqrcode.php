@@ -3,6 +3,7 @@ require_once __DIR__ . '/config/bootstrap.php';
 require_once __DIR__ . '/config/csrf.php';
 require_once __DIR__ . '/config/rate_limit.php';
 
+global $link;
 // Must be logged in and MFA passed
 if (empty($_SESSION['user_id']) || empty($_SESSION['mfa_passed'])) {
     header('Location: index.php');

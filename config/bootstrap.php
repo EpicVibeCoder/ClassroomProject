@@ -63,8 +63,7 @@ if (is_dev()) {
 session_name(env('SESSION_NAME', 'crb_session'));
 ini_set('session.use_strict_mode', '1');
 ini_set('session.use_only_cookies', '1');
-ini_set('session.sid_length', '64');
-ini_set('session.sid_bits_per_character', '6');
+
 
 // Set cookie attributes. "secure" is based on our HTTPS detection above.
 if ($secure) {

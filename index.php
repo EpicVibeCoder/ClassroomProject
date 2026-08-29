@@ -8,6 +8,8 @@ require_once __DIR__ . '/config/bootstrap.php';
 require_once __DIR__ . '/config/csrf.php';
 require_once __DIR__ . '/config/rate_limit.php';
 
+global $link;
+
 /**
  * - bootstrap.php calls session_start() and defines $link (mysqli)
  * - twoFactor.php will set $_SESSION['mfa_passed']=1 and (re)issue the final login

@@ -6,6 +6,7 @@ require_once __DIR__ . '/config/rate_limit.php';
 
 header('Content-Type: application/json');
 
+global $link;
 // 1. Auth guard
 if (empty($_SESSION['user_id']) || empty($_SESSION['mfa_passed'])) {
     http_response_code(401);

@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } else {
             // Get user ID from the session
             $user_id = $_SESSION['user_id'];
-
+            global $link;
             // Prepare a query to fetch the secret key from the database for the user
             $stmt = $link->prepare("SELECT secret_key FROM user WHERE id = ?");
             $stmt->bind_param("i", $user_id);
