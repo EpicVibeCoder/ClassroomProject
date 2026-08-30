@@ -13,16 +13,14 @@ if (empty($_SESSION['user_id']) || empty($_SESSION['mfa_passed'])) {
 $user_id    = $_SESSION['user_id'];
 $user_email = $_SESSION['user_email'];
 
-include 'vendor/sonata-project/google-authenticator/src/FixedBitNotation.php';
-include 'vendor/sonata-project/google-authenticator/src/GoogleAuthenticatorInterface.php';
-include 'vendor/sonata-project/google-authenticator/src/GoogleAuthenticator.php';
-include 'vendor/sonata-project/google-authenticator/src/GoogleQrUrl.php';
 
-$g = new \Sonata\GoogleAuthenticator\GoogleAuthenticator();
+$g = new \PragmaRX\Google2FA\Google2FA();
+
+
 
 // Generate or reuse secret
 if (empty($_SESSION['pending_2fa_secret'])) {
-    $_SESSION['pending_2fa_secret'] = $g->generateSecret();
+    $_SESSION['pending_2fa_secret'] = $g->generateSecretKey();
 }
 $new_secret = $_SESSION['pending_2fa_secret'];
 
@@ -47,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
-    if ($g->checkCode($new_secret, $code)) {
+    if ($g->verifyKey($new_secret, $code)) {
         if ($stmt = mysqli_prepare($link, $query)) {
             mysqli_stmt_bind_param($stmt, "si", $new_secret, $user_id);
             if (mysqli_stmt_execute($stmt)) {
@@ -76,17 +74,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // ---------- GET branch: render page ----------
-$qrUrl = \Sonata\GoogleAuthenticator\GoogleQrUrl::generate(
-    $user_email,
-    $new_secret,
-    'ClassRoomBookingSystem'
-);
-
-// Fallback for mobile (same device) setup:
-// Allow user to manually enter the secret key, and provide an otpauth:// link.
 $issuer  = 'ClassRoomBookingSystem';
+
 $label   = $issuer . ':' . $user_email;
-$otpauth = 'otpauth://totp/' . rawurlencode($label) . '?secret=' . rawurlencode($new_secret) . '&issuer=' . rawurlencode($issuer);
+$otpauth = $g->getQRCodeUrl($issuer, $user_email, $new_secret);
+$issuer  = 'ClassRoomBookingSystem';
+$qrUrl   = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' . rawurlencode($otpauth) . '&ecc=M';
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -140,7 +135,7 @@ $otpauth = 'otpauth://totp/' . rawurlencode($label) . '?secret=' . rawurlencode(
             </p>
         </div>
         <p class="username">Then enter the 6-digit code below to complete setup.</p>
-        <p class="username">Download <img src="assets/images/authenticator.svg" class="authenticator-inline-icon" alt="" loading="lazy" decoding="async">  <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2" rel="noopener noreferrer" class="download-link-large" target="_blank">GoogleAuthenticator</a></p>
+        <p class="username">Download <img src="assets/images/authenticator.svg" class="authenticator-inline-icon" alt="" loading="lazy" decoding="async"> <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2" rel="noopener noreferrer" class="download-link-large" target="_blank">GoogleAuthenticator</a></p>
 
 
 

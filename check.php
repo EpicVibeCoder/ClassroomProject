@@ -35,22 +35,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt = $link->prepare("SELECT secret_key FROM user WHERE id = ?");
             $stmt->bind_param("i", $user_id);
             $stmt->execute();
+            $secret = null;
             $stmt->bind_result($secret);
 
             if ($stmt->fetch()) {
-                // Include the necessary Google Authenticator files
-                include_once 'vendor/sonata-project/google-authenticator/src/FixedBitNotation.php';
-                include_once 'vendor/sonata-project/google-authenticator/src/GoogleAuthenticatorInterface.php';
-                include_once 'vendor/sonata-project/google-authenticator/src/GoogleAuthenticator.php';
-                include_once 'vendor/sonata-project/google-authenticator/src/GoogleQrUrl.php';
-
-                $g = new \Sonata\GoogleAuthenticator\GoogleAuthenticator();
+                $g = new \PragmaRX\Google2FA\Google2FA();
 
 
 
 
                 // Check the received code against the retrieved secret
-                if ($g->checkCode($secret, $code)) {
+                if ($g->verifyKey($secret, $code)) {
                     $_SESSION['mfa_passed'] = true;
                     echo json_encode(['success' => true, 'message' => 'Code verification successful']);
                     // Perform further actions if the code is correct
